@@ -55,8 +55,6 @@ fn wide_characters() {
 }
 
 #[test]
-#[ignore]
-#[cfg(feature = "grapheme")]
 fn grapheme_clusters() {
     let input = "uüu";
     let output = reverse_string::reverse(input);

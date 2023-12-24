@@ -1,13 +1,8 @@
 pub fn is_armstrong_number(num: u64) -> bool {
-    let pow = if num == 0 { 1 } else { num.ilog10() + 1 };
-    let mut sum: u64 = 0;
-    let mut n = num;
+    let pow = num.to_string().len() as u32;
 
-    while n > 0 {
-        let digit = n % 10;
-        sum += digit.pow(pow);
-        n /= 10;
-    }
-
-    sum == num
+    num == num
+        .to_string()
+        .chars()
+        .fold(0, |sum, c| (c.to_digit(10).unwrap() as u64).pow(pow) + sum)
 }

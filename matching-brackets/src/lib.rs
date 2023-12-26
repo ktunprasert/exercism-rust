@@ -1,5 +1,5 @@
 pub fn brackets_are_balanced(string: &str) -> bool {
-    let mut stack: Vec<char> = Vec::new();
+    let mut stack = Vec::new();
 
     for c in string.chars() {
         match c {

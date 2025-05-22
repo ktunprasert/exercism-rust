@@ -10,14 +10,13 @@ fn char_count(word: &str) -> HashMap<char, u16> {
     map
 }
 
-pub fn anagrams_for<'a>(word: &str, possible_anagrams: &'a [&str]) -> HashSet<&'a str> {
+pub fn anagrams_for<'a>(word: &str, possible_anagrams: &[&'a str]) -> HashSet<&'a str> {
     let map = char_count(word);
 
     possible_anagrams
         .iter()
-        .filter(|target| {
-            target.to_lowercase() != word.to_lowercase() && map == char_count(target)
-        })
-        .map(|t| *t)
+        .filter(|target| target.to_lowercase() != word.to_lowercase() && map == char_count(target))
+        // .map(|t| *t)
+        .copied()
         .collect()
 }

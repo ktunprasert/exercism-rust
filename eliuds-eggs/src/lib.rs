@@ -1,11 +1,7 @@
-pub fn egg_count(display_value: u32) -> usize {
-    let mut eggs: u32 = 0;
-    let mut dp = display_value;
-
-    while dp > 0 {
-        eggs += dp & 1;
-        dp >>= 1;
+pub fn egg_count(dv: u32) -> usize {
+    match dv {
+        0 => 0,
+        _ if dv & 1 == 1 => 1 + egg_count(dv >> 1),
+        _ => egg_count(dv >> 1),
     }
-
-    eggs as usize
 }

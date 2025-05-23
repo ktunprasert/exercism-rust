@@ -22,10 +22,9 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn len(&self) -> usize {
-        if self.me.is_some() {
-            1 + self.next.as_ref().map_or(0, |n| n.len())
-        } else {
-            0
+        match self.me {
+            Some(_) => 1 + self.next.as_ref().map_or(0, |n| n.len()),
+            _ => 0
         }
     }
 

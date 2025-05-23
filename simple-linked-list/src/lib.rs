@@ -77,14 +77,10 @@ impl<T> SimpleLinkedList<T> {
 
 impl<T> FromIterator<T> for SimpleLinkedList<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut list = Self::new();
-        let mut it = iter.into_iter();
-
-        while let Some(item) = it.next() {
+        iter.into_iter().fold(Self::new(), |mut list, item| {
             list.push(item);
-        }
-
-        list
+            list
+        })
     }
 }
 
@@ -101,7 +97,7 @@ impl<T> FromIterator<T> for SimpleLinkedList<T> {
 
 impl<T> From<SimpleLinkedList<T>> for Vec<T> {
     fn from(mut linked_list: SimpleLinkedList<T>) -> Vec<T> {
-        let mut vec = vec!();
+        let mut vec = vec![];
 
         while let Some(el) = linked_list.pop() {
             vec.push(el);

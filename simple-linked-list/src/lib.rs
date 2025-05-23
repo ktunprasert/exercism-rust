@@ -1,76 +1,62 @@
-#[derive(Default, Debug)]
+use std::iter::from_fn;
+
+#[derive(Default)]
 pub struct SimpleLinkedList<T> {
-    me: Option<T>,
-    next: Option<Box<Self>>,
+    head: Option<Box<Node<T>>>,
+    size: usize,
+}
+
+pub struct Node<T> {
+    me: T,
+    next: Option<Box<Node<T>>>,
+}
+
+impl<T> Node<T> {
+    pub fn new(me: T, next: Option<Box<Node<T>>>) -> Self {
+        Self { me, next }
+    }
 }
 
 impl<T> SimpleLinkedList<T> {
     pub fn new() -> Self {
         Self {
-            me: None,
-            next: None,
+            head: None,
+            size: 0,
         }
     }
 
-    // You may be wondering why it's necessary to have is_empty()
-    // when it can easily be determined from len().
-    // It's good custom to have both because len() can be expensive for some types,
-    // whereas is_empty() is almost always cheap.
-    // (Also ask yourself whether len() is expensive for SimpleLinkedList)
     pub fn is_empty(&self) -> bool {
-        self.me.is_none() && self.next.is_none()
+        self.head.is_none()
     }
 
     pub fn len(&self) -> usize {
-        match self.me {
-            Some(_) => 1 + self.next.as_ref().map_or(0, |n| n.len()),
-            _ => 0
-        }
+        self.size
     }
 
     // FILO
-    pub fn push(&mut self, element: T) {
-        if self.is_empty() {
-            self.me = Some(element);
-        } else {
-            let cpy = Box::new(Self {
-                me: self.me.take(),
-                next: self.next.take(),
-            });
-
-            self.me = Some(element);
-            self.next = Some(cpy);
-        }
+    pub fn push(&mut self, el: T) {
+        self.size += 1;
+        self.head = Some(Box::new(Node::new(el, self.head.take())))
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        if self.is_empty() {
-            None
-        } else if self.next.is_none() {
-            self.me.take()
-        } else {
-            let mut next = self.next.take().unwrap();
-            let ret = self.me.take();
-            self.me = next.me.take();
-            self.next = next.next.take();
-
-            ret
-        }
+        self.head.take().map(|node| {
+            self.head = node.next;
+            self.size -= 1;
+            node.me
+        })
     }
 
     pub fn peek(&self) -> Option<&T> {
-        self.me.as_ref()
+        self.head.as_ref().map(|node| &node.me)
     }
 
     #[must_use]
     pub fn rev(&mut self) -> SimpleLinkedList<T> {
-        let mut reversed: Vec<T> = vec![];
-
-        while let Some(next) = self.pop() {
-            reversed.push(next);
-        }
-
-        Self::from_iter(reversed)
+        from_fn(|| self.pop()).fold(Self::new(), |mut ll, node| {
+            ll.push(node);
+            ll
+        })
     }
 }
 
@@ -83,24 +69,12 @@ impl<T> FromIterator<T> for SimpleLinkedList<T> {
     }
 }
 
-// In general, it would be preferable to implement IntoIterator for SimpleLinkedList<T>
-// instead of implementing an explicit conversion to a vector. This is because, together,
-// FromIterator and IntoIterator enable conversion between arbitrary collections.
-//
-// The reason this exercise's API includes an explicit conversion to Vec<T> instead
-// of IntoIterator is that implementing that interface is fairly complicated, and
-// demands more of the student than we expect at this point in the track.
-//
-// Please note that the "front" of the linked list should correspond to the "back"
-// of the vector as far as the tests are concerned.
-
 impl<T> From<SimpleLinkedList<T>> for Vec<T> {
     fn from(mut linked_list: SimpleLinkedList<T>) -> Vec<T> {
-        let mut vec = vec![];
-
-        while let Some(el) = linked_list.pop() {
-            vec.push(el);
-        }
+        let mut vec = from_fn(|| linked_list.pop()).fold(Vec::new(), |mut vec, node| {
+            vec.push(node);
+            vec
+        });
 
         vec.reverse();
         vec

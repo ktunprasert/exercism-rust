@@ -1,43 +1,37 @@
-use std::{collections::HashMap, iter::once};
+use std::iter::once;
 
 pub struct PascalsTriangle {
-    data: Vec<Vec<u32>>,
-    memo: HashMap<u32, Vec<u32>>,
+    count: usize,
 }
 
 impl PascalsTriangle {
-    pub fn new(count: u32) -> Self {
-        let mut s = Self {
-            data: Vec::new(),
-            memo: HashMap::new(),
-        };
-
-        s.data = (1..=count).map(|i| s.make_triangle(i)).collect();
-        s
-    }
-
-    pub fn make_triangle(&mut self, at: u32) -> Vec<u32> {
-        if let Some(row) = self.memo.get(&at) {
-            return row.clone();
-        }
-
-        let row = match at {
-            1 => vec![1],
-            _ => once(1)
-                .chain(
-                    self.make_triangle(at - 1)
-                        .windows(2)
-                        .map(|pair| pair[0] + pair[1]),
-                )
-                .chain(once(1))
-                .collect(),
-        };
-
-        self.memo.insert(at, row.clone());
-        row
+    pub fn new(count: usize) -> Self {
+        Self { count }
     }
 
     pub fn rows(&self) -> Vec<Vec<u32>> {
-        self.data.clone()
+        let mut out: Vec<Vec<u32>> = Vec::with_capacity(self.count);
+        let mut prev = vec![];
+
+        if self.count == 0 {
+            return out;
+        }
+
+        if self.count >= 1 {
+            out.push(vec![1]);
+            prev = vec![1];
+        }
+
+        for _ in 1..self.count {
+            let current: Vec<u32> = once(1)
+                .chain(prev.windows(2).map(|pair| pair[0] + pair[1]))
+                .chain(once(1))
+                .collect();
+
+            out.push(current.clone());
+            prev = current.clone();
+        }
+
+        out
     }
 }

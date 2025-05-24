@@ -1,4 +1,4 @@
-use std::{collections::HashMap, iter};
+use std::{collections::HashMap, iter::once};
 
 pub struct PascalsTriangle {
     data: Vec<Vec<u32>>,
@@ -6,48 +6,35 @@ pub struct PascalsTriangle {
 }
 
 impl PascalsTriangle {
-    pub fn new(row_count: u32) -> Self {
+    pub fn new(count: u32) -> Self {
         let mut s = Self {
             data: Vec::new(),
             memo: HashMap::new(),
         };
 
-        s.init(row_count);
+        s.data = (1..=count).map(|i| s.make_triangle(i)).collect();
         s
     }
 
-    fn init(&mut self, count: u32) {
-        if count == 0 {
-            self.data = vec![];
-            return;
-        }
-
-        self.data = (1..=count)
-            .map(|i| {
-                let next = self.make_triangle(i);
-                self.memo.insert(i, next.clone());
-
-                next
-            })
-            .collect()
-    }
-
-    pub fn make_triangle(&self, at: u32) -> Vec<u32> {
+    pub fn make_triangle(&mut self, at: u32) -> Vec<u32> {
         if let Some(row) = self.memo.get(&at) {
             return row.clone();
         }
 
-        match at {
+        let row = match at {
             1 => vec![1],
-            _ => iter::once(1)
+            _ => once(1)
                 .chain(
                     self.make_triangle(at - 1)
                         .windows(2)
                         .map(|pair| pair[0] + pair[1]),
                 )
-                .chain(iter::once(1))
+                .chain(once(1))
                 .collect(),
-        }
+        };
+
+        self.memo.insert(at, row.clone());
+        row
     }
 
     pub fn rows(&self) -> Vec<Vec<u32>> {

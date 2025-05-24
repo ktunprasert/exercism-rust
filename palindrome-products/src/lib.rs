@@ -18,39 +18,61 @@ impl Palindrome {
     }
 }
 
-pub fn palindrome_products(min: u64, max: u64) -> Option<(Palindrome, Palindrome)> {
-    let mut prods: BTreeMap<u64, Vec<(u64, u64)>> = BTreeMap::new();
-
+// Helper to collect all distinct factor pairs (x, y) for a palindrome value in range
+fn factor_pairs(n: u64, min: u64, max: u64) -> Vec<(u64, u64)> {
+    let mut pairs = Vec::new();
+    let sqrt = (n as f64).sqrt() as u64;
     for x in min..=max {
-        for y in x..=max {
-            prods
-                .entry(x * y)
-                .or_insert_with(Vec::new)
-                .push((x.min(y), x.max(y)));
+        if x > sqrt {
+            break;
+        }
+
+        if n % x == 0 {
+            let y = n / x;
+            if y >= min && y <= max {
+                pairs.push((x, y));
+            }
         }
     }
 
-    let min = prods
-        .iter()
-        .find(|(x, _)| is_palindrome(x))
-        .map(|(&value, prod)| Palindrome {
-            value,
-            prod: prod.clone(),
-        });
-
-    let max = prods
-        .iter()
-        .rev()
-        .find(|(x, _)| is_palindrome(x))
-        .map(|(&value, prod)| Palindrome {
-            value,
-            prod: prod.clone(),
-        });
-
-    min.zip(max)
+    pairs
 }
 
-fn is_palindrome(n: &u64) -> bool {
+pub fn palindrome_products(min: u64, max: u64) -> Option<(Palindrome, Palindrome)> {
+    // Search for min palindrome (start from smallest product)
+    let mut min_palindrome = None;
+    for prod in (min * min)..=(max * max) {
+        if is_palindrome(prod) {
+            let pairs = factor_pairs(prod, min, max);
+            if !pairs.is_empty() {
+                min_palindrome = Some(Palindrome {
+                    value: prod,
+                    prod: pairs,
+                });
+                break;
+            }
+        }
+    }
+
+    // Search for max palindrome (start from largest product)
+    let mut max_palindrome = None;
+    for prod in (min * min..=max * max).rev() {
+        if is_palindrome(prod) {
+            let pairs = factor_pairs(prod, min, max);
+            if !pairs.is_empty() {
+                max_palindrome = Some(Palindrome {
+                    value: prod,
+                    prod: pairs,
+                });
+                break;
+            }
+        }
+    }
+
+    min_palindrome.zip(max_palindrome)
+}
+
+fn is_palindrome(n: u64) -> bool {
     if n.lt(&10) {
         return true;
     }

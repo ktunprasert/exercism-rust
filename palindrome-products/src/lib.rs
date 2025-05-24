@@ -37,35 +37,28 @@ fn factor_pairs(n: u64, min: u64, max: u64) -> Vec<(u64, u64)> {
 }
 
 pub fn palindrome_products(min: u64, max: u64) -> Option<(Palindrome, Palindrome)> {
-    // Search for min palindrome (start from smallest product)
-    let mut min_palindrome = None;
-    for prod in (min * min)..=(max * max) {
-        if is_palindrome(prod) {
+    let min_palindrome = (min * min..=(max * max))
+        .into_iter()
+        .filter(|prod| is_palindrome(*prod))
+        .find_map(|prod| {
             let pairs = factor_pairs(prod, min, max);
-            if !pairs.is_empty() {
-                min_palindrome = Some(Palindrome {
-                    value: prod,
-                    prod: pairs,
-                });
-                break;
-            }
-        }
-    }
+            (!pairs.is_empty()).then_some(Palindrome {
+                value: prod,
+                prod: pairs,
+            })
+        });
 
-    // Search for max palindrome (start from largest product)
-    let mut max_palindrome = None;
-    for prod in (min * min..=max * max).rev() {
-        if is_palindrome(prod) {
+    let max_palindrome = (min * min..=(max * max))
+        .rev()
+        .into_iter()
+        .filter(|prod| is_palindrome(*prod))
+        .find_map(|prod| {
             let pairs = factor_pairs(prod, min, max);
-            if !pairs.is_empty() {
-                max_palindrome = Some(Palindrome {
-                    value: prod,
-                    prod: pairs,
-                });
-                break;
-            }
-        }
-    }
+            (!pairs.is_empty()).then_some(Palindrome {
+                value: prod,
+                prod: pairs,
+            })
+        });
 
     min_palindrome.zip(max_palindrome)
 }

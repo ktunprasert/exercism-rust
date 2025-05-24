@@ -22,10 +22,6 @@ pub fn lsp(string_digits: &str, span: usize) -> Result<u64, Error> {
         digits.push(c.to_digit(10).unwrap() as u64)
     }
 
-    if digits.len() == span {
-        return Ok(digits.into_iter().product());
-    }
-
     digits
         .windows(span)
         .map(|x| x.iter().product::<u64>())

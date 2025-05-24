@@ -10,25 +10,19 @@ impl PascalsTriangle {
     }
 
     pub fn rows(&self) -> Vec<Vec<u32>> {
-        let mut out: Vec<Vec<u32>> = Vec::with_capacity(self.count);
-        let mut prev = vec![];
-
-        if self.count >= 1 {
-            out.push(vec![1]);
-            prev = vec![1];
+        if self.count == 0 {
+            return vec![];
         }
 
-        (1..self.count)
-            .fold((out, prev), |(mut acc, prev), _| {
-                let current: Vec<u32> = once(1)
-                    .chain(prev.windows(2).map(|pair| pair[0] + pair[1]))
+        (1..self.count).fold(vec![vec![1]], |mut acc, _| {
+            acc.push(
+                once(1)
+                    .chain(acc.last().unwrap().windows(2).map(|pair| pair[0] + pair[1]))
                     .chain(once(1))
-                    .collect();
+                    .collect::<Vec<u32>>(),
+            );
 
-                acc.push(current.clone());
-
-                (acc, current)
-            })
-            .0
+            acc
+        })
     }
 }

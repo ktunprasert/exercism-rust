@@ -3,7 +3,8 @@ use std::collections::{BTreeMap, HashSet};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Palindrome {
     // prod: (u64, u64),
-    prod: HashSet<(u64, u64)>,
+    // prod: HashSet<(u64, u64)>,
+    prod: Vec<(u64, u64)>,
     value: u64,
 }
 
@@ -13,19 +14,19 @@ impl Palindrome {
     }
 
     pub fn into_factors(self) -> HashSet<(u64, u64)> {
-        self.prod
+        self.prod.into_iter().collect()
     }
 }
 
 pub fn palindrome_products(min: u64, max: u64) -> Option<(Palindrome, Palindrome)> {
-    let mut prods: BTreeMap<u64, HashSet<(u64, u64)>> = BTreeMap::new();
+    let mut prods: BTreeMap<u64, Vec<(u64, u64)>> = BTreeMap::new();
 
     for x in min..=max {
-        for y in min..=max {
+        for y in x..=max {
             prods
                 .entry(x * y)
-                .or_insert_with(HashSet::new)
-                .insert((x.min(y), x.max(y)));
+                .or_insert_with(Vec::new)
+                .push((x.min(y), x.max(y)));
         }
     }
 

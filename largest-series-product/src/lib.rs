@@ -2,29 +2,23 @@
 pub enum Error {
     SpanTooLong,
     InvalidDigit(char),
-    NoProduct,
 }
 
 pub fn lsp(string_digits: &str, span: usize) -> Result<u64, Error> {
-    if span > string_digits.len() {
-        return Err(Error::SpanTooLong);
-    } else if span == 0 {
+    if span == 0 {
         return Ok(1);
     }
 
-    let mut digits = vec![];
-
-    for c in string_digits.chars() {
-        if !c.is_digit(10) {
-            return Err(Error::InvalidDigit(c));
-        }
-
-        digits.push(c.to_digit(10).unwrap() as u64)
-    }
-
-    digits
+    string_digits
+        .chars()
+        .map(|c| {
+            c.to_digit(10)
+                .ok_or(Error::InvalidDigit(c))
+                .map(|d| d as u64)
+        })
+        .collect::<Result<Vec<u64>, _>>()?
         .windows(span)
-        .map(|x| x.iter().product::<u64>())
+        .map(|w| w.iter().product::<u64>())
         .max()
-        .ok_or(Error::NoProduct)
+        .ok_or(Error::SpanTooLong)
 }

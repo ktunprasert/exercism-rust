@@ -1,6 +1,12 @@
 use std::cmp::Ordering;
 
-fn search(array: &[i32], key: i32, idx: usize) -> Option<usize> {
+fn search<U: AsRef<[T]>, T: Ord>(array: U, key: T, idx: usize) -> Option<usize> {
+    let array = array.as_ref();
+
+    if array.is_empty() {
+        return None;
+    }
+
     if array.len() == 1 && key != array[0] {
         return None;
     }
@@ -13,10 +19,6 @@ fn search(array: &[i32], key: i32, idx: usize) -> Option<usize> {
     }
 }
 
-pub fn find(array: &[i32], key: i32) -> Option<usize> {
-    if array.is_empty() || array.len() == 0 {
-        return None;
-    }
-
+pub fn find<U: AsRef<[T]>, T: Ord>(array: U, key: T) -> Option<usize> {
     search(array, key, 0)
 }

@@ -5,16 +5,8 @@ fn search(array: &[i32], key: i32, idx: usize) -> Option<usize> {
         return None;
     }
 
-    println!("{}", key);
-
     let n = array.len() / 2;
-    println!("a: {:?}, n: {}, idx: {}", array, n, idx);
-
-    let cond = key.cmp(&array[n]);
-
-    println!("{:?}", cond);
-
-    match cond {
+    match key.cmp(&array[n]) {
         Ordering::Equal => Some(n + idx),
         Ordering::Less => search(&array[..n], key, idx.min(n)),
         Ordering::Greater => search(&array[n..], key, idx + n),

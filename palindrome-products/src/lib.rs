@@ -1,9 +1,9 @@
-use std::collections::{BTreeSet, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Palindrome {
     // prod: (u64, u64),
-    prod:HashSet<(u64, u64)>,
+    prod: HashSet<(u64, u64)>,
     value: u64,
 }
 
@@ -18,28 +18,33 @@ impl Palindrome {
 }
 
 pub fn palindrome_products(min: u64, max: u64) -> Option<(Palindrome, Palindrome)> {
-    let tree: BTreeSet<_> = (min..max).map(|x| (x, x)).fold(
-        BTreeSet::new() as BTreeSet<(u64, (u64, u64))>,
-        |mut acc, (x, y)| {
-            acc.insert((x * y, (x, y)));
-            acc
-        },
-    );
+    let mut prods: BTreeMap<u64, HashSet<(u64, u64)>> = BTreeMap::new();
 
-    // find first palindrome from left and from right
-    let min = tree
+    for x in min..=max {
+        for y in min..=max {
+            prods
+                .entry(x * y)
+                .or_insert_with(HashSet::new)
+                .insert((x.min(y), x.max(y)));
+        }
+    }
+
+    let min = prods
         .iter()
         .find(|(x, _)| is_palindrome(x))
-        .map(|(value, prod)| Palindrome { value: *value, prod: *prod });
+        .map(|(&value, prod)| Palindrome {
+            value,
+            prod: prod.clone(),
+        });
 
-    let mut it = tree.iter();
-    let max = std::iter::from_fn(|| it.next_back())
+    let max = prods
+        .iter()
+        .rev()
         .find(|(x, _)| is_palindrome(x))
-        .map(|(value, prod)| Palindrome { value: *value, prod: *prod });
-
-    println!("min: {:?}", min);
-    println!("max: {:?}", max);
-
+        .map(|(&value, prod)| Palindrome {
+            value,
+            prod: prod.clone(),
+        });
 
     min.zip(max)
 }

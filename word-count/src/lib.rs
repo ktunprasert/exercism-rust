@@ -1,21 +1,21 @@
 use std::collections::HashMap;
 
-const SINGLE_QUOTE: char = '\'';
+const QUOT: char = '\'';
 
 /// Count occurrences of words.
 pub fn word_count(words: &str) -> HashMap<String, u32> {
     words
         .to_ascii_lowercase()
         .split(|c| match c {
-            '\'' => false,
+            QUOT => false,
             _ => c.is_ascii_whitespace() || c.is_ascii_punctuation(),
         })
         .filter_map(|mut s| {
-            if s.starts_with(SINGLE_QUOTE) {
+            if s.starts_with(QUOT) {
                 s = s.get(1..).unwrap_or(s)
             }
 
-            if s.ends_with(SINGLE_QUOTE) && !s.is_empty() {
+            if s.ends_with(QUOT) && !s.is_empty() {
                 s = s.get(..s.len() - 1).unwrap_or(s)
             }
 

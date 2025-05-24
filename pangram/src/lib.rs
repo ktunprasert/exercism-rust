@@ -6,12 +6,10 @@ pub fn is_pangram(sentence: &str) -> bool {
         .chars()
         .try_fold(0, |mut seen, c| match c {
             _ if seen == PANGRAM => Err(()),
-            'A'..='Z' => {
-                seen |= 1 << (c as u8 - b'A');
-                Ok(seen)
-            }
-            'a'..='z' => {
-                seen |= 1 << (c as u8 - b'a');
+            'A'..='Z' | 'a'..='z' => {
+                // 32 put both to be lowercase based
+                let idx = (c as u8 | 32) - b'a';
+                seen |= 1 << idx;
                 Ok(seen)
             }
             _ => Ok(seen),

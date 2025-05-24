@@ -1,9 +1,7 @@
-use std::collections::{BTreeMap, HashSet};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Palindrome {
-    // prod: (u64, u64),
-    // prod: HashSet<(u64, u64)>,
     prod: Vec<(u64, u64)>,
     value: u64,
 }
